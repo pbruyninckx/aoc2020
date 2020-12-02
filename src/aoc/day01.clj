@@ -26,7 +26,7 @@
         [solution-triplet] (filter #(= 2020 (reduce + %)) triplets)]
     (reduce * solution-triplet)))
 
-(defn day1 []
+(defn run []
   (with-open [rdr (io/reader "resources/input01.txt")]
     (let [numbers (map #(Integer/parseInt %) (line-seq rdr))]
       (println (solve numbers))
