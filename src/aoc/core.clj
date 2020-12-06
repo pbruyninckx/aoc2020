@@ -1,8 +1,6 @@
 (ns aoc.core
   (:gen-class))
 
-(require '[aoc.day01 :as day01])
-
 (defn -main
   "Runs the code for the given day"
   [day & args]
