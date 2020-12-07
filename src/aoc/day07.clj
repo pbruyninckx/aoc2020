@@ -43,8 +43,21 @@
         parents (reduce #(merge-with set/union %1 %2) inverted-rules)]
     (dec (count (get-parents-of "shiny gold" parents)))))
 
+(defn rules-as-set [seq-rules]
+  (into {} (map #(vector (:left %) (:right %)) seq-rules)))
+
+(defn solve2 [rules start]
+  (if-not
+    (rules start)
+    1
+    (let [el-rules (rules start)
+          sub-results (mapv #(solve2 rules %) (map :colour el-rules))
+          sub-amounts (mapv :amount el-rules)]
+      (reduce + (map (fn [ret am] (* (inc ret) am)) sub-results sub-amounts)))))
+
 (defn run []
   (with-open [rdr (io/reader "resources/input07.txt")]
     (let [lines (line-seq rdr)
           rules (map parse-rule lines)]
-      (println (solve rules)))))
+      (println (solve rules))
+      (println (solve2 (rules-as-set rules) "shiny gold")))))
