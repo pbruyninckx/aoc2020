@@ -56,12 +56,11 @@
 
 
 (defn solve2 [program]
-  (let [maybe-fixed-programs (changed-programs program)]
-    (loop [[p & remaining] maybe-fixed-programs]
-      (let [end-state (run-program p)]
-        (if (terminated? end-state)
-          (:acc end-state)
-          (recur remaining))))))
+  (->> (changed-programs program)
+       (map run-program)
+       (filter terminated?)
+       first
+       :acc))
 
 (defn run []
   (with-open [rdr (io/reader "resources/input08.txt")]
