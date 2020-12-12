@@ -28,7 +28,7 @@
     \S (update-in state [1 1] #(- % n))
     \W (update-in state [1 0] #(- % n))
     \E (update-in state [1 0] #(+ % n))
-    \F (update state 0 #(mapv (fn [p dp] (+ p (* n dp))) % delta))
+    \F (update state 0 #(mapv + % (mapv (partial * n) delta)))
     \L (update state 1 #((apply comp (repeat (/ n 90) rotate-delta-left)) %))
     \R (update state 1 #((apply comp (repeat (/ n 90) rotate-delta-right)) %))))
 
