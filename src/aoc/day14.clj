@@ -6,7 +6,8 @@
     (let [mask (subs s 7)]
       {:type :mask
        :value
-             {:and (Long/parseLong (str/replace mask #"X" "1") 2)
+             {:raw mask
+              :and (Long/parseLong (str/replace mask #"X" "1") 2)
               :or  (Long/parseLong (str/replace mask #"X" "0") 2)}})
     {:type :mem
      :address (Long/parseLong (re-find #"\d+" s))
@@ -18,7 +19,15 @@
       (bit-and (:and mask))
       (bit-or (:or mask))))
 
-(defn solve [instructions]
+(defn update-memory [memory instruction mask]
+  (assoc memory
+    (:address instruction)
+    (apply-mask (:value instruction) mask)))
+
+(defn update-memory2 [memory instruction mask]
+  memory)
+
+(defn solve [instructions update-memory-fn]
   (loop [memory {}
          mask nil
          [instruction & remaining] instructions]
@@ -27,10 +36,10 @@
           (= (:type instruction) :mask)
           (recur memory (:value instruction) remaining)
           :else
-          (recur (assoc
+          (recur (update-memory-fn
                    memory
-                   (:address instruction)
-                   (apply-mask (:value instruction) mask))
+                   instruction
+                   mask)
                  mask
                  remaining))))
 
@@ -40,4 +49,5 @@
 
 (defn run []
   (let [data (read-data)]
-    (println (solve data))))
+    (println (solve data update-memory))
+    (println (solve data update-memory2))))
