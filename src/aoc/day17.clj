@@ -10,7 +10,7 @@
         (map-indexed
           (fn [row-index row]
             (map-indexed (fn [col-index char]
-                           ({\# [row-index col-index 0]} char))
+                           ({\# [row-index col-index 0 0]} char))
                          row))
           (str/split-lines s))]
     (->> indexed-data
@@ -18,13 +18,14 @@
          (filter identity)
          set)))
 
-(defn neighbours [[x y z]]                                  ; xy- switch doesn't matter here
+(defn neighbours [[x y z t]]                                  ; xy- switch doesn't matter here
   (letfn [(neighbours-1 [el] (range (dec el) (+ 2 el)))]
     (for [xn (neighbours-1 x)
           yn (neighbours-1 y)
           zn (neighbours-1 z)
-          :when (not (and (= x xn) (= y yn) (= z zn)))]
-      [xn yn zn])))
+          tn (neighbours-1 t)
+          :when (not (and (= x xn) (= y yn) (= z zn) (= t tn)))]
+      [xn yn zn tn])))
 
 (defn next-cycle [data]
   (let [current-neighbours
@@ -50,7 +51,6 @@
 
 (defn solve [data]
   (loop [data data n 0]
-    (println n)
     (if (= n 6)
       (count data)
       (recur (next-cycle data) (inc n)))))
