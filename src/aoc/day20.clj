@@ -28,7 +28,7 @@
       :both (into borders reverse-borders)
       :orig borders)))
 
-(defn solve [data]
+(defn get-corner-tiles [data]
   (let [edge-borders
         (->> data
              vals
@@ -38,16 +38,21 @@
              (filter #(= 1  (% 1)))
              (map #(% 0))
              set)]
-    (letfn [(is-edge-tile [[_ tile]]
+    (letfn [(is-corner-tile [[_ tile]]
               (->> (get-borders tile :orig)
                    set
                    (set/intersection edge-borders)
                    count
                    (= 2)))]
       (->> data
-           (filter is-edge-tile)
-           (map #(% 0))
-           (apply *)))))
+           (filter is-corner-tile)))))
+
+
+(defn solve [data]
+  (->> data
+       get-corner-tiles
+       (map #(% 0))
+       (apply *)))
 
 (defn run []
   (let [data (parse-data (slurp "resources/input20.txt"))]
