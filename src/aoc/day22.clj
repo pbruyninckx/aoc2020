@@ -34,6 +34,37 @@
                [(reduce conj d1 [c1 c2]) d2]
                [d1 (reduce conj d2 [c2 c1])])))))
 
+(defn recursive-combat [decks seen-decks]
+  "Returns winner (0 or 1) and decks"
+  (cond
+    (seen-decks decks)
+    [0 decks]
+    (empty? (first decks))
+    [1 decks]
+    (empty? (second decks))
+    [0 decks]
+    :else
+    (let [[c1 c2 :as top-cards] (map peek decks)
+          [d1 d2 :as popped-decks] (map pop decks)
+          winner
+          (if (and (<= c1 (count d1))
+                   (<= c2 (count d2)))
+            (first (recursive-combat
+                     (mapv (fn [c d] (queue (take c d)))
+                           top-cards popped-decks)
+                     #{}))
+            (if (> c1 c2) 0 1))]
+       (recur
+         (update (vec popped-decks)
+                 winner
+                 #(reduce conj % (if (= winner 0) [c1 c2] [c2 c1])))
+         (conj seen-decks decks)))))
+
+(defn solve2 [data]
+  (let [[winner decks] (recursive-combat data #{})]
+    (get-score (nth decks winner))))
+
 (defn run []
   (let [data (parse-data (slurp "resources/input22.txt"))]
-    (println (solve data))))
+    (println (solve data))
+    (println (solve2 data))))
