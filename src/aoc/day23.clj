@@ -27,24 +27,25 @@
                           :else val))]
     [(next-val c)
      (-> next-val
-         (assoc current (next-val c))
-         (assoc c (next-val next-dest))
-         (assoc next-dest a))]))
+         (assoc! current (next-val c))
+         (assoc! c (next-val next-dest))
+         (assoc! next-dest a))]))
 
 (defn print-seq [current next-val]
   (println (take (dec (count next-val)) (to-seq current next-val))))
 
 (defn move-cups [current next-val num-iters]
-  (if
-    (= num-iters 0)
-    [current next-val]
-    (let [[current next-val] (move current next-val)]
-      (recur current next-val (dec num-iters)))))
+  (letfn [(move-cups-transient [current next-val num-iters]
+            (if
+              (= num-iters 0)
+              [current next-val]
+              (let [[current next-val] (move current next-val)]
+                (recur current next-val (dec num-iters)))))]
+    (move-cups-transient current (transient next-val) num-iters)))
 
 (defn solve [data]
   (let [[start-value initial-next-values] data
-        [_ final-next-values] (move-cups start-value initial-next-values 100)
-        ]
+        [_ final-next-values] (move-cups start-value initial-next-values 100)]
     (->> (to-seq 1 final-next-values)
          rest
          (take (- (count initial-next-values) 2))
